@@ -8,10 +8,11 @@ import (
 	"archive/zip"
 	"encoding/xml"
 	"errors"
-	"golang.org/x/net/html/charset"
 	"io"
 	"path"
 	"strings"
+
+	"golang.org/x/net/html/charset"
 )
 
 type containerXML struct {

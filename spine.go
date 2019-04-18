@@ -7,7 +7,11 @@ package epubgo
 import (
 	"errors"
 	"io"
+	"net/url"
 )
+
+//ErrLastEntry It is the last entry
+var ErrLastEntry = errors.New("It is the last entry")
 
 // SpineIterator is an iterator on the epub pages spine
 //
@@ -44,7 +48,7 @@ func (spine SpineIterator) IsLast() bool {
 // Returns an error if is the last
 func (spine *SpineIterator) Next() error {
 	if spine.IsLast() {
-		return errors.New("It is the last entry")
+		return ErrLastEntry
 	}
 	spine.index++
 	return nil
@@ -61,10 +65,19 @@ func (spine *SpineIterator) Previous() error {
 	return nil
 }
 
+//RootPath root path
+func (spine SpineIterator) RootPath() string {
+	return spine.epub.rootPath
+}
+
 // Open opens the file of the iterator
 func (spine SpineIterator) Open() (io.ReadCloser, error) {
-	url := spine.URL()
-	return spine.epub.OpenFile(url)
+	u := spine.URL()
+	decodeURL, err := url.QueryUnescape(u)
+	if err != nil {
+		return nil, err
+	}
+	return spine.epub.OpenFile(decodeURL)
 }
 
 // URL returns the url of the item on the iterator
