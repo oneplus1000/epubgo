@@ -29,28 +29,31 @@ func (v validateError) Error() string {
 }
 
 //Validate validate epub file
-func Validate(epub *Epub) error {
-
-	err := validateNcx(epub)
-	if err != nil {
-		return err
+func Validate(epub *Epub) []error {
+	var errs []error
+	errNcxs := validateNcx(epub)
+	if errNcxs != nil {
+		errs = append(errs, errNcxs...)
 	}
-
-	return nil
+	//fmt.Printf("xlen %d\n", len(errs))
+	return errs
 }
 
-func validateNcx(epub *Epub) error {
+func validateNcx(epub *Epub) []error {
 
+	var errs []error
 	navs := epub.ncx.navMap()
 	for _, n := range navs {
 		url := n.URL()
+		//fmt.Printf("url %s\n", url)
 		err := checkZipContent(epub, url)
 		if err != nil {
-			return err
+			//fmt.Printf("url %s not found\n", url)
+			errs = append(errs, err)
 		}
 	}
 
-	return nil
+	return errs
 }
 
 func checkZipContent(epub *Epub, url string) error {
