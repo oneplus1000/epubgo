@@ -46,7 +46,7 @@ func validateNcx(epub *Epub) []error {
 	for _, n := range navs {
 		url := n.URL()
 		//fmt.Printf("url %s\n", url)
-		err := checkZipContent(epub, url)
+		err := checkZipContent(epub, url, ".ncx")
 		if err != nil {
 			//fmt.Printf("url %s not found\n", url)
 			errs = append(errs, err)
@@ -56,7 +56,7 @@ func validateNcx(epub *Epub) []error {
 	return errs
 }
 
-func checkZipContent(epub *Epub, url string) error {
+func checkZipContent(epub *Epub, url string, checkfrom string) error {
 	found := false
 	for _, zf := range epub.zip.File {
 		zfname := removePathOebps(zf.Name)
@@ -69,7 +69,7 @@ func checkZipContent(epub *Epub, url string) error {
 	if !found {
 		return validateError{
 			errType: ValidateErrorTypeFileNotFound,
-			errMsg:  fmt.Sprintf("file %s not found", url),
+			errMsg:  fmt.Sprintf("file %s not found (serach in %s)", url, checkfrom),
 		}
 	}
 	return nil
