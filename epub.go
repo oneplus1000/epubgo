@@ -6,6 +6,7 @@ package epubgo
 
 import (
 	"archive/zip"
+	"bytes"
 	"errors"
 	"io"
 	"os"
@@ -40,6 +41,12 @@ func Open(path string) (e *Epub, err error) {
 	}
 	err = e.load(e.file, fileInfo.Size())
 	return
+}
+
+// LoadByte loads an epub from []byte
+func LoadByte(data []byte) (e *Epub, err error) {
+	r := bytes.NewReader(data)
+	return Load(r, int64(r.Len()))
 }
 
 // Load loads an epub from an io.ReaderAt

@@ -5,8 +5,19 @@ import (
 	"strings"
 )
 
+//Condition condition for validate epub
+type Condition struct {
+	MaxImageSizeByte int64 //set to zero for no limit นี้คือ size ใน memory หลังจาก decode แล้วนะ
+}
+
 //ValidateErrorTypeFileNotFound file not found
 var ValidateErrorTypeFileNotFound = 1
+
+//ValidateErrorTypeFileDamaged file เสียหาย
+var ValidateErrorTypeFileDamaged = 2
+
+//ValidateErrorTypeOverMaxImageSize file too big
+var ValidateErrorTypeOverMaxImageSize = 3
 
 //ValidateError validate error
 type ValidateError interface {
@@ -29,11 +40,15 @@ func (v validateError) Error() string {
 }
 
 //Validate validate epub file
-func Validate(epub *Epub) []error {
+func Validate(epub *Epub, condition *Condition) []error {
 	var errs []error
 	errNcxs := validateNcx(epub)
 	if errNcxs != nil {
 		errs = append(errs, errNcxs...)
+	}
+	errImgs := validateImage(epub, condition)
+	if errImgs != nil {
+		errs = append(errs, errImgs...)
 	}
 	//fmt.Printf("xlen %d\n", len(errs))
 	return errs
